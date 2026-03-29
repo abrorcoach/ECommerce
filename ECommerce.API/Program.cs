@@ -1,4 +1,5 @@
 using System.Text;
+using ECommerce.API.Middleware;
 using ECommerce.Application.Interfaces;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Services;
@@ -49,7 +50,8 @@ builder.Services.AddSwaggerGen(c =>
 
 // Database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DatabaseConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DatabaseConnection"),
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -109,6 +111,8 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

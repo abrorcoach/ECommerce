@@ -1,4 +1,5 @@
 using ECommerce.Application.DTOs;
+using ECommerce.Application.Exceptions;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
@@ -25,7 +26,7 @@ public class AuthService : IAuthService
 
         if (existingUser != null)
         {
-            throw new Exception("User with this email already exists");
+            throw new BusinessException("User with this email already exists");
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -65,7 +66,7 @@ public class AuthService : IAuthService
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         var token = _jwtService.GenerateToken(user);
